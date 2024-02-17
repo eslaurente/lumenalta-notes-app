@@ -1,7 +1,34 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 
 export const NoteForm = (props) => {
-    const { note = { title: '', text: '' } } = props
+    const { note, onChange, onSubmit } = props;
+
+
+    const handleOnCancel = (e) => {
+        e.preventDefault();
+        onChange(null);
+    };
+
+    const handleTitleValueChange = (e) => {
+        e.preventDefault();
+        onChange({
+            ...note ?? undefined,
+            title: e.target.value,
+        });
+    };
+
+    const handleTextValueChange = (e) => {
+        e.preventDefault();
+        onChange({
+            ...note  ?? undefined,
+            text: e.target.value,
+        });
+    };
+
+    const handleOnSubmit = (e) => {
+        e.preventDefault();
+        onSubmit(note);
+    };
 
     return <form>
         <div className="form-group">
@@ -10,6 +37,8 @@ export const NoteForm = (props) => {
                 className="form-control"
                 data-testid="input-title"
                 name="title"
+                value={note?.title ?? ''}
+                onChange={handleTitleValueChange}
             />
         </div>
         <div className="form-group">
@@ -18,6 +47,8 @@ export const NoteForm = (props) => {
                 className="form-control"
                 data-testid="input-text"
                 name="text"
+                value={note?.text ?? ''}
+                onChange={handleTextValueChange}
             />
         </div>
         <div className="form-group">
@@ -26,12 +57,14 @@ export const NoteForm = (props) => {
                 data-testid="cancel-note"
                 className="btn btn-default pull-right"
                 value="Cancel"
+                onClick={handleOnCancel}
             />
             <input
                 type="submit"
                 data-testid="save-note"
                 className="btn btn-default pull-right"
                 value="Save"
+                onClick={handleOnSubmit}
             />
         </div>
     </form>

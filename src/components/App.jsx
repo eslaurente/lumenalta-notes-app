@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, {useEffect, useState} from 'react'
 
 import { NotesList } from './NotesList'
 import { NoteForm } from './NoteForm'
@@ -6,30 +6,44 @@ import { NoteForm } from './NoteForm'
 export const App = (props) => {
     const { service } = props
 
-    const [notes, setNotes] = useState([])
-    const [selected, setSelected] = useState(null)
+    const [notes, setNotes] = useState([]);
+    const [selected, setSelected] = useState(null);
 
     // (!) Get notes from service
+    useEffect(() => {
+        (async () => {
+            setNotes(await service.getNotes());
+        })();
+    }, []);
 
     // Select new empty note
-    function newNote(){
-
-    }
+    const newNote = async () => {
+        await service.saveNote(selected);
+        setNotes(await service.getNotes());
+    };
 
     // Set note as selected
-    function onSelect(note){
-
-    }
+    const onSelect = (note) => {
+        setSelected(note);
+    };
 
     // Save note to service
-    function onSubmit(note){
-
-    }
+    const onSubmit = (note) => {
+        service.saveNote(note);
+    };
 
     // Unselect note
-    function onCancel(){
+    const onCancel = () => {
+        setSelected(null);
+    };
 
-    }
+    const onNoteFormUpdate = (note) => {
+        if (note == null) {
+            setSelected(null);
+            return;
+        }
+        setSelected({...selected, ...note});
+    };
 
     return (
         <div className="container">
@@ -40,11 +54,19 @@ export const App = (props) => {
             </div>
             <div className="row">
                 <div className="col-md-4">
-                    <NotesList notes={[]} />
+                    <NotesList notes={notes} selected={selected} onSelect={onSelect} />
                 </div>
                 <div className="col-md-8">
-                    <NoteForm />
-                    <div><button id="new-note">New Note</button></div>
+                    <NoteForm
+                        note={selected}
+                        onChange={onNoteFormUpdate}
+                        onSubmit={onSubmit}
+                    />
+                    {(!selected || !selected?.id )&& (
+                        <div>
+                            <button id="new-note" onClick={newNote}>New Note</button>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
