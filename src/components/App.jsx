@@ -18,6 +18,9 @@ export const App = (props) => {
 
     // Select new empty note
     const newNote = async () => {
+        if (!selected) {
+            return;
+        }
         await service.saveNote(selected);
         setNotes(await service.getNotes());
     };
@@ -28,17 +31,15 @@ export const App = (props) => {
     };
 
     // Save note to service
-    const onSubmit = (note) => {
-        service.saveNote(note);
+    const onSubmit = async (note) => {
+        await service.saveNote(note);
+        setNotes(await service.getNotes());
     };
 
-    // Unselect note
-    const onCancel = () => {
-        setSelected(null);
-    };
 
     const onNoteFormUpdate = (note) => {
         if (note == null) {
+            // Unselect note
             setSelected(null);
             return;
         }
@@ -62,9 +63,9 @@ export const App = (props) => {
                         onChange={onNoteFormUpdate}
                         onSubmit={onSubmit}
                     />
-                    {(!selected || !selected?.id )&& (
+                    {(!selected || !selected?.id) && (
                         <div>
-                            <button id="new-note" onClick={newNote}>New Note</button>
+                            <button id="new-note" data-testid="new-note" onClick={newNote}>New Note</button>
                         </div>
                     )}
                 </div>
